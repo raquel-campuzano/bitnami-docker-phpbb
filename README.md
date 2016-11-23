@@ -20,7 +20,7 @@ Running phpBB with a database server is the recommended way. You can either use 
 
 This is the recommended way to run phpBB. You can use the following docker compose template:
 
-```
+```yaml
 version: '2'
 
 services:
@@ -57,13 +57,13 @@ If you want to run the application manually instead of using docker-compose, the
 
 1. Create a new network for the application and the database:
 
-  ```
+  ```bash
   $ docker network create phpbb_network
   ```
 
 2. Start a MariaDB database in the network generated:
 
-  ```
+  ```bash
   $ docker run -d --name mariadb --net=phpbb_network bitnami/mariadb
   ```
 
@@ -71,7 +71,7 @@ If you want to run the application manually instead of using docker-compose, the
 
 3. Run the phpBB container:
 
-  ```
+  ```bash
   $ docker run -d -p 80:80 --name phpbb --net=phpbb_network bitnami/phpbb
   ```
 
@@ -86,7 +86,8 @@ If you remove every container and volume all your data will be lost, and the nex
 ### Mount persistent folders in the host using docker-compose
 
 This requires a sightly modification from the template previously shown:
-```
+
+```yaml
 version: '2'
 
 services:
@@ -113,13 +114,13 @@ In this case you need to specify the directories to mount on the run command. Th
 
 1. If you haven't done this before, create a new network for the application and the database:
 
-  ```
+  ```bash
   $ docker network create phpbb_network
   ```
 
 2. Start a MariaDB database in the previous network:
 
-  ```
+  ```bash
   $ docker run -d --name mariadb -v /your/local/path/bitnami/mariadb_data:/bitnami/mariadb  --net=phpbb_network bitnami/mariadb
   ```
 
@@ -127,7 +128,7 @@ In this case you need to specify the directories to mount on the run command. Th
 
 3. Run the phpBB container:
 
-  ```
+  ```bash
   $ docker run -d -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb_network bitnami/phpbb
   ```
 
@@ -137,7 +138,7 @@ Bitnami provides up-to-date versions of MariaDB and phpBB, including security pa
 
 1. Get the updated images:
 
-  ```
+  ```bash
   $ docker pull bitnami/phpbb:latest
   ```
 
@@ -163,7 +164,8 @@ Bitnami provides up-to-date versions of MariaDB and phpBB, including security pa
  When you start the phpbb image, you can adjust the configuration of the instance by passing one or more environment variables either on the docker-compose file or on the docker run command line. If you want to add a new environment variable:
 
  * For docker-compose add the variable name and value under the application section:
-```
+
+```yaml
 application:
   image: bitnami/phpbb:latest
   ports:
@@ -174,7 +176,7 @@ application:
 
  * For manual execution add a `-e` option with each variable and value:
 
-```
+```bash
  $ docker run -d -e PHPBB_PASSWORD=my_password -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb_network bitnami/phpbb
 ```
 
@@ -201,7 +203,7 @@ This would be an example of SMTP configuration using a GMail account:
 
  * docker-compose:
 
-```
+```yaml
   application:
     image: bitnami/phpbb:latest
     ports:
@@ -215,7 +217,7 @@ This would be an example of SMTP configuration using a GMail account:
 
  * For manual execution:
 
-```
+```bash
  $ docker run -d -e SMTP_HOST=smtp.gmail.com -e SMTP_PORT=587 -e SMTP_USER=your_email@gmail.com -e SMTP_PASSWORD=your_password -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb_network bitnami/phpbb
 ```
 
@@ -231,7 +233,7 @@ To backup your application data follow these steps:
 
 2. Copy the phpBB data folder in the host:
 
-  ```
+  ```bash
   $ docker cp /your/local/path/bitnami:/bitnami/phpbb
   ```
 
