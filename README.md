@@ -58,13 +58,13 @@ If you want to run the application manually instead of using docker-compose, the
 1. Create a new network for the application and the database:
 
   ```bash
-  $ docker network create phpbb_network
+  $ docker network create phpbb-tier
   ```
 
 2. Start a MariaDB database in the network generated:
 
   ```bash
-  $ docker run -d --name mariadb --net=phpbb_network bitnami/mariadb
+  $ docker run -d --name mariadb --net=phpbb-tier bitnami/mariadb
   ```
 
   *Note:* You need to give the container a name in order to phpBB to resolve the host
@@ -72,7 +72,7 @@ If you want to run the application manually instead of using docker-compose, the
 3. Run the phpBB container:
 
   ```bash
-  $ docker run -d -p 80:80 --name phpbb --net=phpbb_network bitnami/phpbb
+  $ docker run -d -p 80:80 --name phpbb --net=phpbb-tier bitnami/phpbb
   ```
 
 Then you can access your application at http://your-ip/
@@ -94,18 +94,18 @@ services:
   mariadb:
     image: 'bitnami/mariadb:latest'
     volumes:
-      - '/path/to/your/local/mariadb_data:/bitnami/mariadb'
-  application:
+      - '/path/to/mariadb-persistence:/bitnami/mariadb'
+  phpbb:
     image: 'bitnami/phpbb:latest'
     ports:
       - '80:80'
       - '443:443'
-    volumes:
-      - '/path/to/your/local/phpbb_data:/bitnami/phpbb'
-      - '/path/to/your/local/apache_data:/bitnami/apache'
-      - '/path/to/your/local/php_data:/bitnami/php'
     depends_on:
       - mariadb
+    volumes:
+      - '/path/to/phpbb-persistence:/bitnami/phpbb'
+      - '/path/to/apache-persistence:/bitnami/apache'
+      - '/path/to/php-persistence:/bitnami/php'
 ```
 
 ### Mount persistent folders manually
@@ -115,13 +115,16 @@ In this case you need to specify the directories to mount on the run command. Th
 1. If you haven't done this before, create a new network for the application and the database:
 
   ```bash
-  $ docker network create phpbb_network
+  $ docker network create phpbb-tier
   ```
 
 2. Start a MariaDB database in the previous network:
 
   ```bash
-  $ docker run -d --name mariadb -v /your/local/path/bitnami/mariadb_data:/bitnami/mariadb  --net=phpbb_network bitnami/mariadb
+  $ docker run -d --name mariadb \
+    --net phpbb-tier \
+    -- volume path/to/mariadb-persistence:/bitnami/mariadb \
+    bitnami/mariadb:latest
   ```
 
   *Note:* You need to give the container a name in order to phpBB to resolve the host
@@ -129,7 +132,12 @@ In this case you need to specify the directories to mount on the run command. Th
 3. Run the phpBB container:
 
   ```bash
-  $ docker run -d -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb_network bitnami/phpbb
+  $ docker run -d --name phpbb -p 80:80 -p 443:443 \
+    --net phpbb-tier \
+    --volume /path/to/phpbb-persistence:/bitnami/phpbb \
+    --volume /path/to/apache-persistence:/bitnami/apache \
+    --volume /path/to/php-persistence:/bitnami/php \
+    bitnami/phpbb:latest
   ```
 
 # Upgrade this application
@@ -177,7 +185,7 @@ application:
  * For manual execution add a `-e` option with each variable and value:
 
 ```bash
- $ docker run -d -e PHPBB_PASSWORD=my_password -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb_network bitnami/phpbb
+ $ docker run -d -e PHPBB_PASSWORD=my_password -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb-tier bitnami/phpbb
 ```
 
 Available variables:
@@ -218,7 +226,7 @@ This would be an example of SMTP configuration using a GMail account:
  * For manual execution:
 
 ```bash
- $ docker run -d -e SMTP_HOST=smtp.gmail.com -e SMTP_PORT=587 -e SMTP_USER=your_email@gmail.com -e SMTP_PASSWORD=your_password -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb_network bitnami/phpbb
+ $ docker run -d -e SMTP_HOST=smtp.gmail.com -e SMTP_PORT=587 -e SMTP_USER=your_email@gmail.com -e SMTP_PASSWORD=your_password -p 80:80 --name phpbb -v /your/local/path/bitnami/phpbb:/bitnami/phpbb --net=phpbb-tier bitnami/phpbb
 ```
 
 
